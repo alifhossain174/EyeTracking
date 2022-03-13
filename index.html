@@ -1,0 +1,132 @@
+<!DOCTYPE HTML >
+<html>
+
+<head>
+    <title>Talenxo Eyetracking</title>
+    <meta name="author" content="Talenxo">
+    <meta name="description" content="Accurate & Robust WebCam Online Eye-Tracking.">
+    <style>
+        .buttonStartEyeTrack {
+            background-color: rgb(255, 102, 0);
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            display: block;
+            margin: auto;
+            font-size: 16px;
+            border-radius: 8px;
+        }
+    </style>
+    <script src="js/GazeCloudAPI.js"></script>
+    <script src="js/heatmapLive.js"></script>
+    <style type="text/css">
+        body {
+            overflow: hidden;
+        }
+    </style>
+    <script type="text/javascript">
+        function PlotGaze(GazeData) {
+
+            document.getElementById("GazeData").innerHTML = "GazeX: " + GazeData.GazeX + " GazeY: " + GazeData.GazeY;
+            document.getElementById("HeadPhoseData").innerHTML = " HeadX: " + GazeData.HeadX + " HeadY: " + GazeData.HeadY + " HeadZ: " + GazeData.HeadZ;
+            document.getElementById("HeadRotData").innerHTML = " Yaw: " + GazeData.HeadYaw + " Pitch: " + GazeData.HeadPitch + " Roll: " + GazeData.HeadRoll;
+
+            if (!document.getElementById("ShowHeatMapId").checked) // gaze plot
+            {
+                var x = GazeData.docX;
+                var y = GazeData.docY;
+
+                var gaze = document.getElementById("gaze");
+                x -= gaze.clientWidth / 2;
+                y -= gaze.clientHeight / 2;
+
+                gaze.style.left = x + "px";
+                gaze.style.top = y + "px";
+
+                if (GazeData.state != 0) {
+                    if (gaze.style.display == 'block')
+                        gaze.style.display = 'none';
+                } else {
+                    if (gaze.style.display == 'none')
+                        gaze.style.display = 'block';
+                }
+            }
+        }
+
+        //////set callbacks/////////
+        window.addEventListener("load", function() {
+            GazeCloudAPI.OnCalibrationComplete = function() {
+                ShowHeatMap();
+                console.log('gaze Calibration Complete')
+            }
+            GazeCloudAPI.OnCamDenied = function() {
+                console.log('camera  access denied')
+            }
+            GazeCloudAPI.OnError = function(msg) {
+                console.log('err: ' + msg)
+            }
+            GazeCloudAPI.UseClickRecalibration = true;
+            GazeCloudAPI.OnResult = PlotGaze;
+        });
+
+        function handleClickHeatMap(cb) {
+            if (cb.checked) {
+                ShowHeatMap();
+                document.getElementById("gaze").style.display = 'none';;
+            } else {
+                RemoveHeatMap()
+            }
+        }
+
+        function start() {
+            document.getElementById("startid").style.display = 'none';
+            document.getElementById("stopid").style.display = 'block';
+            GazeCloudAPI.StartEyeTracking();
+            if (false) {
+                GazeCloudAPI.SetFps(15);
+            }
+        }
+
+        function stop() {
+            document.getElementById("startid").style.display = 'block';
+            document.getElementById("stopid").style.display = 'none';
+            GazeCloudAPI.StopEyeTracking();
+        }
+    </script>
+</head>
+
+<body>
+    <div style="text-align: center;display: block">
+        <h1>Talenxo Eye Tracking Demo</h1>
+        <h4>WebCam Online Eye-Tracking</h4>
+        <br>
+
+        <button id='startid' class='buttonStartEyeTrack' type="button" onclick="start() ">Start eye tracking</button>
+        <button id='stopid' style='display:none' class='buttonStartEyeTrack' type="button" onclick="stop();">Stop</button>
+        <div style='background-color: lightblue;'>
+            <p>
+                Real-Time Data:
+                <p id="GazeData"> </p>
+                <p id="HeadPhoseData"> </p>
+                <p id="HeadRotData"> </p>
+            </p>
+        </div>
+
+        <div id="gaze" style='position: absolute;display:none;width: 100px;height: 100px;border-radius: 50%;border: solid 2px  rgba(255, 255,255, .2);	box-shadow: 0 0 100px 3px rgba(125, 125,125, .5);	pointer-events: none;	z-index: 999999'></div>
+
+        <label for="ShowHeatMapId">
+            Show heatmap <input id="ShowHeatMapId" type="checkbox" checked="" onclick='handleClickHeatMap(this);'>
+        </label>
+    </div>
+
+
+
+</body>
+
+</html>
