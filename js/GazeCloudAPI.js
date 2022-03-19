@@ -2187,14 +2187,6 @@
         var disableStyle = function(styleName, disabled) {
             return;
         };
-        if (true) //load style
-        {
-            try {
-                var style = '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> <link rel="stylesheet" href="https://api.gazerecorder.com/GazeCloudAPI.css" >';
-                document.getElementsByTagName('head')[0].insertAdjacentHTML('afterbegin', style);
-                //disableStyle('GazeCloudAPI.css',true);
-            } catch (e) {}
-        }
 
         function InitGUI() {
 
@@ -2625,4 +2617,5 @@ function InitOldAPI() {
     } catch (e) {}
 }
 var processClick = GazeCloudAPI.processClick;
+/////////end Version 1.0.0///////////ssClick;
 /////////end Version 1.0.0///////////ssClick;
