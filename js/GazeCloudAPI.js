@@ -33,10 +33,6 @@
                     StartGazeFlow();
                 }
             }
-            /////////Version 1.0.0///////////
-            if (true)
-                InitOldAPI();
-            /////////end Version 1.0.0///////////
         }
         this.StopEyeTracking = function() {
             StopGazeFlow();
@@ -294,10 +290,6 @@
                 vPoints.push(pp);
             }
 
-
-            // var _CalibrationData = JSON.stringify(vPoints);
-            //_CalibrationData += " ";
-
             if (GazeCloudAPI.oCalibrationData != null) {
                 try {
                     var data = JSON.parse(GazeCloudAPI.oCalibrationData);
@@ -436,34 +428,7 @@
             }, 30);
             if (true) UpdateGUI(_GazeData);
         }
-        //------------------------------
-        function isFullscreen() {
-            var st = screen.top || screen.availTop || window.screenTop;
-            if (st != window.screenY) {
-                return false;
-            }
-            return window.fullScreen == true || screen.height - document.documentElement.clientHeight <= 30;
-        }
-        //------------------------------
-        function InitClickCalibration() {
-            document.onmousedown = processClick;
-            return;
-            var cursorX;
-            var cursorY;
-            document.onmousedown = function(e) {
-                cursorX = e.screenX;
-                cursorY = e.screenY;
-                console.log("InitClickCalibration click document.onmousedown ");
-                if (!bIsRunCalibration) {
-                    CurCalPoint = {
-                        x: cursorX,
-                        y: cursorY,
-                        conf: 1.0,
-                        type: 10
-                    };
-                }
-            }
-        }
+
         //------------------------------
         this.processClick = function(e) {
                 if (!GazeCloudAPI.UseClickRecalibration)
@@ -482,16 +447,9 @@
                     };
                 }
             }
-            //------------------------------
             //////////////////////end Calibration///////////////////////
             /////////////////////BeginCam///////////////////////
-            //====================================
-        var _LastGazeD;
-        var _OnlyEyesC = 0;
-        var _OnlyEyesCount = 0;
         var ctx = null;
-        var ctxL = null;
-        var ctxR = null;
         var _canvas = null;
         var canvasContext = null;
         var bLastUseLowQuality = false;
@@ -859,9 +817,6 @@
                 if (MediaStrem != null) MediaStrem.getTracks()[0].stop();
                 Disconect();
                 UpdateGUI(_GazeData);
-
-                if (false)
-                    LoggSend();
 
 
             } catch (a) {;
@@ -1271,10 +1226,7 @@
                     } catch (e) {};
                     bIsProcesingCalibration = false;
                     bIsCalibrated = true;
-                    if (evt.data.substring(4, 6) == "ok") {
-                        if (true) InitClickCalibration();
-                        /////
-                    }
+
                     if (evt.data.substring(4, 6) == "no") {
 
 
@@ -1976,33 +1928,6 @@
             GazeCloudAPI.StopEyeTracking();
         }, false);
 
-        function httpGetAsync(theUrl, callback) {
-            var xmlHttp = new XMLHttpRequest();
-            xmlHttp.onreadystatechange = function() {
-                if (xmlHttp.readyState == 4 && xmlHttp.status == 200) callback(xmlHttp.responseText);
-            }
-            xmlHttp.open("GET", theUrl, true); // true for asynchronous 
-            xmlHttp.send(null);
-        }
-
-        ////////////log///////////////////
-        function uuidv4() {
-            return 'API:' + 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                var r = Math.random() * 16 | 0,
-                    v = c == 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
-            });
-        }
-        var LogSesionID = uuidv4();
-        if (true) {
-            var info = get_browser_info();
-            info.platform = navigator.platform;
-            info.userAgent = navigator.userAgent;
-            info.Media = MediaInfo;
-            var myJSON = JSON.stringify(info);
-            Logg(myJSON, type = -1);
-        }
-
 
         var LogTxt = '';
 
@@ -2010,31 +1935,6 @@
 
             LogTxt += txt + ' | ';
         }
-
-
-
-        function LoggSend() {
-
-            if (LogTxt == '')
-                return;
-            txt = LogTxt;
-            LogTxt = '';
-            try {
-                let req = new XMLHttpRequest();
-                let formData = new FormData();
-                req.withCredentials = false;
-                formData.append("RecordinSesionId", LogSesionID);
-                formData.append("log", txt);
-                formData.append("type", type);
-                formData.append("sesionid", LogSesionID);
-            } catch (e) {}
-        }
-
-
-        window.addEventListener('beforeunload', function(event) {
-            LoggSend();
-        });
-
 
         if (true) window.addEventListener('DOMContentLoaded', function(event) {
             if (Logg) Logg("GazeCloundAPI v:1.0.2 ", 2);
@@ -2045,24 +1945,12 @@
         }
 
     } //end GazeCloudAPIInit
-    /////////Version 1.0.0///////////
+
+/////////Version 1.0.0///////////
 var StartGazeFlow = GazeCloudAPI.StartEyeTracking;
 var StopGazeFlow = GazeCloudAPI.StopEyeTracking;
 var SetLowFps = GazeCloudAPI.SetLowFps;
 var get_browser_info = GazeCloudAPI.get_browser_info;
 var MediaInfo = "";
-
-function InitOldAPI() {
-    try {
-        if (typeof OnResult !== 'undefined') GazeCloudAPI.OnResult = OnResult;
-        if (typeof OnCalibrationComplete !== 'undefined') GazeCloudAPI.OnCalibrationComplete = OnCalibrationComplete;
-        if (typeof OnCalibrationFail !== 'undefined') GazeCloudAPI.OnCalibrationFail = OnCalibrationFail;
-        if (typeof OnStopGazeFlow !== 'undefined') GazeCloudAPI.OnStopGazeFlow = OnStopGazeFlow;
-        if (typeof OnCamDenied !== 'undefined') GazeCloudAPI.OnCamDenied = OnCamDenied;
-        if (typeof OnError !== 'undefined') GazeCloudAPI.OnError = OnError;
-    } catch (e) {}
-}
 var processClick = GazeCloudAPI.processClick;
-/////////end Version 1.0.0///////////ssClick;
-/////////end Version 1.0.0///////////ssClick;
 /////////end Version 1.0.0///////////ssClick;
