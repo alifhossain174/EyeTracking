@@ -223,8 +223,8 @@
             if (isMobile) SizeF = .7;
             var minSize = 16; // 6 
             var AddSize = 20;
-            var showtime = 800; //800;// 1500.0;
-            var infotime = 2000;
+            var showtime = 200; //800;// 1500.0;
+            var infotime = 1000;
             AddSize = 20 * SizeF;
             minSize = 10 * SizeF;
             var MainColor = "#777777"; // "gray";//"#101010"; "gray";//"#646C7F";
@@ -264,32 +264,34 @@
                     };
                     vPoints.push(p);
                 }
-            if (true) {
-                var x = .5;
-                var y = .5;
-                px = vPoints[vPoints.length + -1].x;
-                py = vPoints[vPoints.length + -1].y;
-                var d = Math.sqrt((x - px) * (x - px) + (y - py) * (y - py));
-                var MoveTime = 200 + (600.0 * d);
-                var pp = {
-                    x: x,
-                    y: y,
-                    color: MainColor,
-                    type: 1,
-                    time: MoveTime
-                };
-                vPoints.push(pp);
-            }
 
-            if (GazeCloudAPI.oCalibrationData != null) {
-                try {
-                    var data = JSON.parse(GazeCloudAPI.oCalibrationData);
-                    vPoints = data;
-                    Logg("oCalibrationData:" + GazeCloudAPI.oCalibrationData, 2);
-                } catch (e) {
-                    Logg("invalid oCalibrationData:" + GazeCloudAPI.oCalibrationData, 2);
-                }
-            }
+
+            // if (true) {
+            //     var x = .5;
+            //     var y = .5;
+            //     px = vPoints[vPoints.length + -1].x;
+            //     py = vPoints[vPoints.length + -1].y;
+            //     var d = Math.sqrt((x - px) * (x - px) + (y - py) * (y - py));
+            //     var MoveTime = 200 + (600.0 * d);
+            //     var pp = {
+            //         x: x,
+            //         y: y,
+            //         color: MainColor,
+            //         type: 1,
+            //         time: MoveTime
+            //     };
+            //     vPoints.push(pp);
+            // }
+
+            // if (GazeCloudAPI.oCalibrationData != null) {
+            //     try {
+            //         // var data = JSON.parse(GazeCloudAPI.oCalibrationData);
+            //         // vPoints = data;
+            //         Logg("oCalibrationData:" + GazeCloudAPI.oCalibrationData, 2);
+            //     } catch (e) {
+            //         Logg("invalid oCalibrationData:" + GazeCloudAPI.oCalibrationData, 2);
+            //     }
+            // }
 
 
             var Ix = 0;
@@ -1218,16 +1220,16 @@
                     bIsProcesingCalibration = false;
                     bIsCalibrated = true;
 
-                    if (evt.data.substring(4, 6) == "no") {
+                    // if (evt.data.substring(4, 6) == "no") {
 
 
-                        if (document.getElementById("InvalidCalibrationInfo") != null)
-                            ShowErr(document.getElementById("InvalidCalibrationInfo").innerHTML);
-                        else
-                            ShowErr("Invalid Calibration!");
+                    //     if (document.getElementById("InvalidCalibrationInfo") != null)
+                    //         ShowErr(document.getElementById("InvalidCalibrationInfo").innerHTML);
+                    //     else
+                    //         ShowErr("Invalid Calibration!");
 
 
-                    }
+                    // }
                     return;
                 }
                 ////////////end Calibration complete//////////
@@ -1370,17 +1372,17 @@
                             var myJSON = JSON.stringify(event);
                             Logg(" ws.onclose " + myJSON, -2);
                         }
-                        if (bIsProcesingCalibration || bIsRunCalibration) {
-                            AbortCalibration();
-                            // ShowErr("Invalid Calibration");
+                        // if (bIsProcesingCalibration || bIsRunCalibration) {
+                        //     AbortCalibration();
+                        //     // ShowErr("Invalid Calibration");
 
 
-                            if (document.getElementById("InvalidCalibrationInfo") != null)
-                                ShowErr(document.getElementById("InvalidCalibrationInfo").innerHTML);
-                            else
-                                ShowErr("Invalid Calibration!");
+                        //     if (document.getElementById("InvalidCalibrationInfo") != null)
+                        //         ShowErr(document.getElementById("InvalidCalibrationInfo").innerHTML);
+                        //     else
+                        //         ShowErr("Invalid Calibration!");
 
-                        } else ShowErr("GazeCloud server connection lost!");
+                        // } else ShowErr("GazeCloud server connection lost!");
                     };
                 } else {
                     alert("WebSocket NOT supported by your Browser!");
