@@ -48,12 +48,6 @@
         }
 
         //////Callback//////
-        function SendBinary(s) {
-            var uint8array = new TextEncoder("utf-8").encode(s);
-            ws.send(uint8array);
-        }
-
-        //-----------------
         this.AddIFrameEvent = function(event) {
                 //df
                 try {
@@ -66,7 +60,6 @@
             //-----------------
         let eventsWebRec = [];
         var bStopR = false;
-        var WebRecFinished = false;
 
         function StopWebRec() {
             bStopR = true;
@@ -88,19 +81,6 @@
         };
         var _LastGazeData = null;
 
-        //==============================
-        function GetPix() {
-            const __canvas = document.createElement('canvas');
-            var __canvasContext = __canvas.getContext('2d');
-            __canvas.width = video.videoWidth;
-            __canvas.height = video.videoHeight;
-            __canvasContext.drawImage(video, 0, 0, __canvas.width, __canvas.height);
-            var imgPixels = __canvasContext.getImageData(0, 0, __canvas.width, __canvas.height);
-            return imgPixels;
-        }
-        //------------------------------
-
-
         //------------------------------
         /////////////////end GetFPS/////////////////
         var CurCalPoint = null;
@@ -115,21 +95,6 @@
         //===========================================
         var _LoopCalibration;
 
-        function AbortCalibration() {
-            bIsCalibrated = false;
-            CurCalPoint = null;
-            bIsProcesingCalibration = false;
-            bIsRunCalibration = false;
-            clearInterval(_LoopCalibration);
-            document.getElementById("CalCanvasId").style.backgroundColor = 'white';
-            document.getElementById("CalDivId").style.display = "none";
-            document.getElementById("infoWaitForCalibration").style.display = "none";
-            if (false)
-                if (GazeCloudAPI.OnCalibrationFail != null) GazeCloudAPI.OnCalibrationFail();
-            GUIState = 'InvalidCalibration';
-            if (true) UpdateGUI(_GazeData);
-        }
-        //===========================================
         function FinishCalibration() {
 
             Info.RunCalStat = GetStat();
@@ -266,34 +231,6 @@
                 }
 
 
-            // if (true) {
-            //     var x = .5;
-            //     var y = .5;
-            //     px = vPoints[vPoints.length + -1].x;
-            //     py = vPoints[vPoints.length + -1].y;
-            //     var d = Math.sqrt((x - px) * (x - px) + (y - py) * (y - py));
-            //     var MoveTime = 200 + (600.0 * d);
-            //     var pp = {
-            //         x: x,
-            //         y: y,
-            //         color: MainColor,
-            //         type: 1,
-            //         time: MoveTime
-            //     };
-            //     vPoints.push(pp);
-            // }
-
-            // if (GazeCloudAPI.oCalibrationData != null) {
-            //     try {
-            //         // var data = JSON.parse(GazeCloudAPI.oCalibrationData);
-            //         // vPoints = data;
-            //         Logg("oCalibrationData:" + GazeCloudAPI.oCalibrationData, 2);
-            //     } catch (e) {
-            //         Logg("invalid oCalibrationData:" + GazeCloudAPI.oCalibrationData, 2);
-            //     }
-            // }
-
-
             var Ix = 0;
             var x = 0;
             var y = .3;
@@ -304,7 +241,6 @@
             Ix = 0;
             size = 1.0;
             if (true) {
-                ws.send(sendScreensize());
                 ws.send("cmd:StartCalibration");
             }
             if (true) UpdateGUI(_GazeData);
@@ -696,10 +632,7 @@
                 dd.FrameNr = CurFrameNr;
                 CurFrameNr++;
                 var myJSON = JSON.stringify(dd);
-                if (false)
-                    SendBinary(myJSON);
-                else
-                    ws.send(myJSON);
+                ws.send(myJSON);
             } // end send
             if (bNewVideoGrap) {
                 CheckFpsDelayIter++;
@@ -735,12 +668,10 @@
 
         var _CamLoopInterval = 36; //15;//10;//36;//15;
         function InitCamSend() {
-            //UpdateCamFPS();
             var FPS = 30;
             try {
                 if (_fps < 0) {
                     _fps = video.srcObject.getVideoTracks()[0].getSettings().frameRate;
-                    //alert("sframeRate " +_fps );
                     FPS = _fps;
                     FPS = 28; // tmp test
                 }
@@ -752,22 +683,6 @@
         //--------------------------------------
         var MediaStrem = null;
 
-        function HideGUI() {
-            try {
-                var GazeFlowContainer = document.getElementById("GazeFlowContainer");
-                GazeFlowContainer.style.display = 'none';
-                showinit.style.display = 'none';
-                loadid.style.display = 'none';
-                initializingid.style.display = 'none';
-                CalDivId.style.display = 'none';
-                infoWaitForCalibration.style.display = 'none';
-                errid.style.display = 'none';
-                demoid.style.display = 'none';
-                CamAccessid.style.display = 'none';
-                camid.style.display = 'none';
-                disableStyle('GazeCloudAPI.css', true);
-            } catch (ee) {}
-        }
         //--------------------------------------
         function CloseWebCam() {
             try {
@@ -780,7 +695,6 @@
                     SkipFactor = 1;
                     _delaySendC = 0;
                     bCamOk = false;
-                    //ws = null;
                     _delaySendC = 0;
                     curTimeStap = 0;
                     CurFrameNr = 0;
@@ -1002,136 +916,12 @@
         var ConnectCount = 0;
         var GoodFrameCount = 0;
         var BadFrameCount = 0;
-        var RedirectPort = 43335;
         //------------------------------
         var GetCloudAdressReady = false;
         var _WaitForGetCloudAdress = null;
         var GetCloudAdresInfo = null;
-
-
-        //------------------------------
-        var _WaitForGetCloudAdressReconect = null;
-        var GetCloudAdressReconectCount = 0;
         var vConnectHistory = [];
 
-        ////////////////////
-        //------------------------------
-        function ResetGetCloudAdressReconnect() {
-            vConnectHistory = [];
-            GetCloudAdressReconectCount = 0;
-            if (_WaitForGetCloudAdressReconect != null) {
-                clearTimeout(_WaitForGetCloudAdressReconect);
-                _WaitForGetCloudAdressReconect = null;
-            }
-        }
-        //------------------------------
-
-        function GetCloudAdressReconnectFail() {
-
-            if (_WaitForGetCloudAdressReconect != null) {
-                clearTimeout(_WaitForGetCloudAdressReconect);
-                _WaitForGetCloudAdressReconect = null;
-            }
-            if (Logg) Logg("GetCloudAdressReconnectFail  ");
-
-
-            ShowErr("Can not connect to GazeFlow server!");
-            return;
-        }
-        //------------------------------
-        function GetCloudAdressReconnect() {
-
-
-            Disconect();
-
-            if (Logg) Logg("GetCloudAdressReconnect wait");
-
-            if (GetCloudAdressReconectCount > 3) {
-                GetCloudAdressReconnectFail();
-                return;
-            }
-
-
-            GetCloudAdressReconnectReady = false;
-            var myJSON = JSON.stringify(vConnectHistory);
-            var url = 'https://api.gazerecorder.com/GetCloudAdress/?vConnectHistory=' + myJSON;;
-            let req = new XMLHttpRequest();
-            let formData = new FormData();
-            req.open("GET", url);
-
-            if (_WaitForGetCloudAdressReconect != null) {
-                clearTimeout(_WaitForGetCloudAdressReconect);
-                _WaitForGetCloudAdressReconect = null;
-            }
-
-            req.onload = function() {
-
-                    try {
-                        var info = JSON.parse(req.response);
-                        GetCloudAdresInfo = info;
-                        if (typeof info.err !== 'undefined')
-                            if (info.err != "") {
-                                ShowErr(info.err);
-                                return;
-                            }
-
-                        if (info.adress == 'null') {
-                            GetCloudAdressReconnectFail();
-                            return;
-                        }
-                        if (Logg) Logg("GetCloudAdressReconnectFail ok");
-                        GazeCloudServerAdress = info.adress;
-                        GazeCloudServerPort = info.port;
-                        GetCloudAdressReconnectReady = true;
-                        GetCloudAdressReady = true;
-                        ConnectCount = 0;
-                        RedirectCount = 0;
-
-
-                        Connect();
-                    } catch (e) {}
-                }
-                //end onload
-            req.onerror = function(e) {
-
-
-                GetCloudAdressReconnectFail();
-
-
-                if (Logg) Logg("GetCloudAdressReconnect err ");
-            }
-            req.send(null);
-        }
-
-
-        //------------------------------
-        function WaitForAutoryzation() {
-            RedirectPort = GazeCloudServerPort + 1;
-            if (isWaitForAutoryzation != null) {
-                clearTimeout(isWaitForAutoryzation);
-                isWaitForAutoryzation = null;
-            }
-            isWaitForAutoryzation = setTimeout(function() {
-                if (true) //tmp
-                    if (isWaitForAutoryzation == null) return;
-                if (!ConnectionOk) {
-                    console.log("WaitForAutoryzation fail: reconect");
-                    if (true) {
-                        RedirectPort = GazeCloudServerPort + ConnectCount;
-                        if (RedirectPort > GazeCloudServerPort + 4) RedirectPort = GazeCloudServerPort + 1;
-                        var _url = GazeCloudServerAdress + RedirectPort;
-                        console.log("RedirectCount: " + RedirectCount + " url " + _url);
-                        if (Logg) Logg("RedirectCount: " + RedirectCount + " url " + _url, 2);
-                        RedirectCount++;
-                        Connect(_url);
-                    } else Connect();
-                }
-                if (isWaitForAutoryzation != null) {
-                    clearTimeout(isWaitForAutoryzation);
-                    isWaitForAutoryzation = null;
-                }
-            }, 10000); // 5000); 
-        }
         //======================================
         var Info = { 'RunCalStat': '', 'RunStat': '', 'calInfo': '' };
         this.GetInfo = function() {
@@ -1155,30 +945,21 @@
                     ws.close();
                     return;
                 }
-                if (evt.data.substring(0, 2) == "ok")
-                //if (evt.data == "ok")
-                {
+                if (evt.data.substring(0, 2) == "ok") {
                     GazeFlowSesionID = evt.data.substring(2);
                     ConnectionOk = true;
                     if (isWaitForAutoryzation != null) {
                         clearTimeout(isWaitForAutoryzation);
                         isWaitForAutoryzation = null;
                     }
-                    ////
-                    //console.log("authorization ok");
                     if (Logg) {
                         Logg("authorization ok", 2);
                         Logg("GazeFlowSesionID: " + GazeFlowSesionID, 2);
                     }
-                    ws.send(sendScreensize()); // Send appKey
                     InitCamSend();
-                    if (false) //tmp
-                    {
-                        if (initializingid.style.display != 'none') initializingid.style.display = 'none';
-                    }
                     return;
                 }
-            } // if(!ConnectionOk)
+            }
             ///////gaze data//////////
             {
                 var received_msg = evt.data;
@@ -1203,10 +984,7 @@
                 }
                 ////////////Calibration complete//////////
                 if (evt.data.substring(0, 4) == "Cal:") {
-
                     Info.calInfo = evt.data;
-
-
                     if (Logg) Logg("cal complete " + evt.data, 2);
                     try {
                         document.getElementById("infoWaitForCalibration").style.display = "none";
@@ -1219,17 +997,6 @@
                     } catch (e) {};
                     bIsProcesingCalibration = false;
                     bIsCalibrated = true;
-
-                    // if (evt.data.substring(4, 6) == "no") {
-
-
-                    //     if (document.getElementById("InvalidCalibrationInfo") != null)
-                    //         ShowErr(document.getElementById("InvalidCalibrationInfo").innerHTML);
-                    //     else
-                    //         ShowErr("Invalid Calibration!");
-
-
-                    // }
                     return;
                 }
                 ////////////end Calibration complete//////////
@@ -1252,7 +1019,6 @@
                     if (!isNaN(skipC))
                         if (skipC > 0)
                             skipProcessCount += skipC;
-                        // console.log("processkDelay" + processkDelay + " skipC " + skipC);
                     PlotGazeData(GazeData);
                     return;
                 } catch (error) {
@@ -1302,8 +1068,6 @@
                 ConnectCount++;
                 if (ConnectCount > 4) {
                     console.log("try connect count" + ConnectCount);
-                    //ShowErr("Can not connect to GazeFlow server!");
-                    GetCloudAdressReconnect();
                     return;
                 }
                 AppKey = "AppKeyDemo";
@@ -1338,10 +1102,6 @@
                     //console.log("connecting: " + _url);
                     //////////////////////////////////////////////////
                     ws.onopen = function() {
-                            //if (Logg)  Logg("Connected", -2);
-
-                            //console.log("connected");
-                            WaitForAutoryzation();
                             ws.send("AppKey:" + AppKey); // Send appKey
                         } ///////////end open///////////////////
                         ///////////////////////////////////////////////////
@@ -1359,9 +1119,6 @@
                                 var _url = GazeCloudServerAdress + port;
                                 console.log("ws.onerror  ConnectCount try again" + ConnectCount + "url " + _url);
                                 Connect(_url);
-                            } else {
-
-                                GetCloudAdressReconnect();
                             }
                         }
                         ///////////////////////////////////////////////////
@@ -1372,17 +1129,6 @@
                             var myJSON = JSON.stringify(event);
                             Logg(" ws.onclose " + myJSON, -2);
                         }
-                        // if (bIsProcesingCalibration || bIsRunCalibration) {
-                        //     AbortCalibration();
-                        //     // ShowErr("Invalid Calibration");
-
-
-                        //     if (document.getElementById("InvalidCalibrationInfo") != null)
-                        //         ShowErr(document.getElementById("InvalidCalibrationInfo").innerHTML);
-                        //     else
-                        //         ShowErr("Invalid Calibration!");
-
-                        // } else ShowErr("GazeCloud server connection lost!");
                     };
                 } else {
                     alert("WebSocket NOT supported by your Browser!");
@@ -1426,7 +1172,6 @@
             }, 1000);
         }
         ////////////////end connection//////////////////////
-        //======================
 
 
         /////////////Result//////////////////////
@@ -1440,28 +1185,9 @@
             this.state = -1;
         }
 
-        function GetGazeEvent(time) {
-            var BestIx = 0;
-            var BestDif = 99999999999999;
-            var fLen = GazeResultEvents.length;
-            if (fLen == 0) return null;
-            if (LastGetGazeEvent == null) LastGetGazeEvent = GazeResultEvents[0];
-            for (i = 0; i < fLen; i++) {
-                var dif = Math.abs(GazeResultEvents[i].time - time);
-                if (dif < BestDif) {
-                    BestDif = dif;
-                    BestIx = i;
-                } else break;
-            }
-            if (BestDif > 200) return null;
-            var out = GazeResultEvents[BestIx];
-            LastGetGazeEvent = out;
-            return out;
-        }
         ////////////////////////////////
         var maxDelay = 0;
         var avrDelay = 33;
-        var LastGetGazeEventIx = 0;
         var LastGetGazeEvent = null;
 
         function PlotGazeData(GazeData) {
@@ -1723,7 +1449,7 @@
             if (Logg) Logg("DemoLimit", 2);
             GUIState = 'DemoLimit';
             document.getElementById("demoid").style.display = "block";
-            setTimeout(StopGazeFlow, 3000);
+            // setTimeout(StopGazeFlow, 3000);
             //CloseWebCam();
         }
         //--------------------------------------
@@ -1740,106 +1466,9 @@
                 GazeCloudAPI.OnError(txt);
         }
         ////////////////////end Gui////////////////
-        this.get_browser_info = get_browser_info;
 
-        function get_browser_info() {
-            var ua = navigator.userAgent,
-                tem, M = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
-            if (/trident/i.test(M[1])) {
-                tem = /\brv[ :]+(\d+)/g.exec(ua) || [];
-                return {
-                    name: 'IE ',
-                    version: (tem[1] || '')
-                };
-            }
-            if (M[1] === 'Chrome') {
-                tem = ua.match(/\bOPR\/(\d+)/)
-                if (tem != null) {
-                    return {
-                        name: 'Opera',
-                        version: tem[1]
-                    };
-                }
-            }
-            M = M[2] ? [M[1], M[2]] : [navigator.appName, navigator.appVersion, '-?'];
-            if ((tem = ua.match(/version\/(\d+)/i)) != null) {
-                M.splice(1, 1, tem[1]);
-            }
-            return {
-                name: M[0],
-                version: M[1]
-            };
-        }
-
-        function sendScreensize() {
-            try {
-                var mm_x = document.getElementById('dpimm').offsetWidth;
-                var mm_y = document.getElementById('dpimm').offsetHeight;
-                var wmm = window.screen.width / mm_x; /// window.devicePixelRatio ;
-                var hmm = window.screen.height / mm_y; /// window.devicePixelRatio ;
-                var w = window.screen.width; //* window.devicePixelRatio;
-                var h = window.screen.height; //* window.devicePixelRatio;
-                if (true) {
-                    wmm /= CalDeviceRation;
-                    hmm /= CalDeviceRation;
-                }
-                var orientation = window.orientation;
-                var isMobile = window.orientation > -1;
-                if (typeof window.orientation === 'undefined') orientation = 10;
-                var info = get_browser_info();
-                info.platform = navigator.platform;
-                info.userAgent = navigator.userAgent;
-                info.Media = MediaInfo;
-
-                var r = {
-                    'wmm': wmm,
-                    'hmm': hmm,
-                    'wpx': w,
-                    'hpx': h,
-                    'ratio': window.devicePixelRatio,
-                    orientation: orientation,
-                    winx: window.screenX,
-                    winy: window.screenY,
-                    aW: screen.availWidth,
-                    aH: screen.availHeight,
-                    'innerWidth': window.innerWidth,
-                    'outerWidth': window.outerWidth,
-                    'innerHeight': window.innerHeight,
-                    'outerHeight': window.outerHeight,
-                    "mm_x": mm_x,
-                    "mm_y": mm_y,
-                    "CalDeviceRation": CalDeviceRation,
-                    'camw': video.videoWidth,
-                    'camh': video.videoHeight,
-                    info: info
-                };
-
-                var myJSON = JSON.stringify(r);
-                if (false) alert("screen s" + myJSON);
-                return myJSON;
-            } catch (e) {
-                console.log("sendScreensize exeption ");
-            }
-        }
 
         /////////////////////API/////////////////////////
-        function ResetIntervals() {
-            try {
-                if (isWaitForAutoryzation != null) {
-                    clearTimeout(isWaitForAutoryzation);
-                    isWaitForAutoryzation = null;
-                }
-                if (_LoopSlotWait != null) {
-                    clearInterval(_LoopSlotWait);
-                    _LoopSlotWait = null;
-                }
-
-
-                ResetGetCloudAdressReconnect();
-
-            } catch (e) {}
-        }
-        //--------------------
         var bStarted = false;
 
         function StartGazeFlow() {
@@ -1849,7 +1478,6 @@
             bStarted = true;
             InitGUI();
             if (true) {
-                ResetIntervals();
                 document.getElementById("waitslotid").style.display = 'none';
                 document.getElementById("infoWaitForCalibration").style.display = "none";
                 document.getElementById("errid").style.display = "none";
@@ -1882,7 +1510,6 @@
                 Info.RunStat = GetStat();
 
                 CloseWebCam();
-                HideGUI();
                 if (Logg) Logg("StopGazeFlow", 2);
                 bStarted = false;
             } catch (error) {;
@@ -1916,7 +1543,6 @@
 var StartGazeFlow = GazeCloudAPI.StartEyeTracking;
 var StopGazeFlow = GazeCloudAPI.StopEyeTracking;
 var SetLowFps = GazeCloudAPI.SetLowFps;
-var get_browser_info = GazeCloudAPI.get_browser_info;
 var MediaInfo = "";
 var processClick = GazeCloudAPI.processClick;
 /////////end Version 1.0.0///////////ssClick;
