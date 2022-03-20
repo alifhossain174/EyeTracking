@@ -124,7 +124,6 @@
             document.getElementById("CalCanvasId").style.backgroundColor = 'white';
             document.getElementById("CalDivId").style.display = "none";
             document.getElementById("infoWaitForCalibration").style.display = "none";
-            closeFullscreen();
             if (false)
                 if (GazeCloudAPI.OnCalibrationFail != null) GazeCloudAPI.OnCalibrationFail();
             GUIState = 'InvalidCalibration';
@@ -149,7 +148,6 @@
             document.getElementById("CalDivId").style.display = "none";
             ws.send("cmd:FinishCalibration");
             bIsRunCalibration = false;
-            closeFullscreen();
             document.getElementById("infoWaitForCalibration").style.display = "block";
             GUIState = 'WaitForCalibrationComplete';
             camid.style.position = "fixed";
@@ -173,16 +171,9 @@
         }
         var CalDeviceRation = window.devicePixelRatio;
 
-        function etmp() {}
-
         function ShowCalibration() {
             if (Logg) Logg("ShowCalibration", 2);
-
-
-            if (GazeCloudAPI.oFullScreen)
-                openFullscreen(etmp);
-
-            setTimeout(_ShowCalibration, 200);
+            setTimeout(_ShowCalibration, 100);
         }
         //---------------------
         function _ShowCalibration() {
@@ -1828,34 +1819,7 @@
                 console.log("sendScreensize exeption ");
             }
         }
-        ////////////////////////////////////////
-        function openFullscreen(callback) {
-            // return;
-            try {
-                var elem = document.body;
-                if (elem.requestFullscreen) {
-                    elem.requestFullscreen().then(callback);
-                } else if (elem.mozRequestFullScreen) {
-                    /* Firefox */
-                    elem.mozRequestFullScreen().then(callback);;
-                } else if (elem.webkitRequestFullscreen) {
-                    /* Chrome, Safari and Opera */
-                    elem.webkitRequestFullscreen().then(callback);;
-                } else if (elem.msRequestFullscreen) {
-                    /* IE/Edge */
-                    elem.msRequestFullscreen().then(callback);;
-                    if (false)
-                        if (callback) callback();
-                }
-            } catch (ee) {
-                if (callback) callback();
-            }
-        }
-        /* Close fullscreen */
-        function closeFullscreen() {
-            return;
-        }
-        ////////////////////////////////////////
+
         /////////////////////API/////////////////////////
         function ResetIntervals() {
             try {
