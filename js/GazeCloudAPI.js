@@ -96,11 +96,6 @@
         var _LoopCalibration;
 
         function FinishCalibration() {
-
-            Info.RunCalStat = GetStat();
-
-
-            if (true) SendStat();
             if (true) // update gui
             {
                 camid.style = ' z-index: 1000;position:absolute; left:0%; top:0%; opacity: 0.7; display:none ';
@@ -188,8 +183,8 @@
             if (isMobile) SizeF = .7;
             var minSize = 16; // 6 
             var AddSize = 20;
-            var showtime = 200; //800;// 1500.0;
-            var infotime = 1000;
+            var showtime = 400; //800;// 1500.0;
+            var infotime = 2000;
             AddSize = 20 * SizeF;
             minSize = 10 * SizeF;
             var MainColor = "#777777"; // "gray";//"#101010"; "gray";//"#646C7F";
@@ -357,27 +352,8 @@
             }, 30);
             if (true) UpdateGUI(_GazeData);
         }
-
-        //------------------------------
-        this.processClick = function(e) {
-                if (!GazeCloudAPI.UseClickRecalibration)
-                    return;
-                var cursorX;
-                var cursorY;
-                cursorX = e.screenX;
-                cursorY = e.screenY;
-                //console.log("processClick click document.onmousedown ");
-                if (!bIsRunCalibration) {
-                    CurCalPoint = {
-                        x: cursorX,
-                        y: cursorY,
-                        conf: 1.0,
-                        type: 10
-                    };
-                }
-            }
-            //////////////////////end Calibration///////////////////////
-            /////////////////////BeginCam///////////////////////
+        //////////////////////end Calibration///////////////////////
+        /////////////////////BeginCam///////////////////////
         var ctx = null;
         var _canvas = null;
         var canvasContext = null;
@@ -434,9 +410,7 @@
                 if (Logg) Logg("getFrame exeption : " + ee.message, -2);
             }
         }
-        //--------------------------------------
         /////////////////GetFPS/////////////////
-        //------------------------------
         ////////stat////////
         var minNetworkDelay = 999999;
         var maxNetworkDelay = 0;
@@ -445,21 +419,6 @@
         var processkDelay = 0;
         var skipProcessCount = 0;
         var CamFPS = 0;
-
-
-        function GetStat() {
-            var stat = "CamFPS:" + CamFPS + " minNetworkDelay: " + minNetworkDelay + " maxNetworkDelay: " + maxNetworkDelay + " avrNetworkDelay: " + avrNetworkDelay + " skipProcessCount: " + skipProcessCount + " skipF: " + skipProcessCount / CurFrameNr;
-            return stat;
-        }
-
-        function SendStat() {
-            try {
-                var stat = "CamFPS:" + CamFPS + " minNetworkDelay: " + minNetworkDelay + " maxNetworkDelay: " + maxNetworkDelay + " avrNetworkDelay: " + avrNetworkDelay + " skipProcessCount: " + skipProcessCount + " kipF: " + skipProcessCount / CurFrameNr;
-                if (CamFPS > 0)
-                    if (Logg) Logg("stat : " + stat, 5);
-                ws.send(stat);
-            } catch (e) {}
-        }
         //////end stat/////////
         ///////fps///////
         var fpsstartTime = -1;
@@ -759,8 +718,6 @@
 
         function deniedStream(err) {
             DeneidCount++;
-            // ShowErr("Please, Allow Camera Access to start Eye-Tracking!");
-            //setTimeout(function () {
 
             if (document.getElementById("AllowCamInfo") != null)
                 alert(document.getElementById("AllowCamInfo").innerHTML);
@@ -890,7 +847,6 @@
             StartCamera();
         }
         //-------------------------------------
-        var MediaInfo = "";
 
         function InitVideo(s) {
             try {
@@ -1142,9 +1098,6 @@
         }
         //--------------------------------------
 
-
-        var RetrayCount = 0;
-        var RetrayCountNoSlot = 0;
 
         function WaitForSlot() {
             if (Logg) Logg("WaitForSlot", 2);
@@ -1505,10 +1458,6 @@
         //----------------------------------
         function StopGazeFlow() {
             try {
-                SendStat();
-
-                Info.RunStat = GetStat();
-
                 CloseWebCam();
                 if (Logg) Logg("StopGazeFlow", 2);
                 bStarted = false;
@@ -1543,6 +1492,4 @@
 var StartGazeFlow = GazeCloudAPI.StartEyeTracking;
 var StopGazeFlow = GazeCloudAPI.StopEyeTracking;
 var SetLowFps = GazeCloudAPI.SetLowFps;
-var MediaInfo = "";
-var processClick = GazeCloudAPI.processClick;
 /////////end Version 1.0.0///////////ssClick;
